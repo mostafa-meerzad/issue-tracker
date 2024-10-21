@@ -33,3 +33,30 @@ without `classname` package
 ## classnames package working:
 
 you call `classnames()` function in the `className` attribute and provide an object where `keys` are the `styles` and values are `boolean` values if `true` styles are applied, if `false` not applied
+
+## Configuring Prisma
+
+use `@db` to change the default values provided
+
+`@db.Varchar(charNum)` to specify the varChar yourself the default value for `String` is `varchar(191)`
+
+when using `MySQL` with prisma you can define a type using `enum`
+
+`@updatedAt` makes the DB-engine to use the date-time of the moment the data-entry is updated
+
+```prisma
+model Issue {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  description String   @db.Text
+  status      Status   @default(OPEN)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum Status {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
+```
