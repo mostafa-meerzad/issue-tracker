@@ -60,3 +60,5 @@ enum Status {
   CLOSED
 }
 ```
+
+when using react-hook-form with TS first define an interface defining the form fields and their types
