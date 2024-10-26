@@ -223,3 +223,5 @@ remember to disable the submit button after the form is submitted specially if t
 ```tsx
 <Button disabled={isSubmitting}>Submit {isSubmitting && <Spinner />}</Button>
 ```
+
+# Showing the Issues
