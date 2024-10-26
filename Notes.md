@@ -225,3 +225,136 @@ remember to disable the submit button after the form is submitted specially if t
 ```
 
 # Showing the Issues
+
+## simulating a slow connection using delay
+
+import delay function to simulate a slow connection
+
+```tsx
+import delay from "delay";
+const IssuesPage = async () => {
+  const issues = await prisma.issue.findMany();// call to a service
+  // right after that service call call the delay(delay-in-milliseconds)
+  // it return a promise so need to await it
+  await delay(2000);
+  return (
+    component content
+  )
+  }
+```
+
+### React-loading-skeleton
+
+instead of data in your component you just render `<Skeleton/>` component that simple
+
+#### the component
+
+```tsx
+import prisma from "@/prisma/client";
+import { Button, Table } from "@radix-ui/themes";
+import Link from "next/link";
+import React from "react";
+import IssueStatusBadge from "../components/IssueStatusBadge";
+//import delay function to simulate a slow connection
+import delay from "delay";
+
+const IssuesPage = async () => {
+  const issues = await prisma.issue.findMany();
+  await delay(2000);
+  return (
+    <div>
+      <div className="mb-5">
+        <Button>
+          <Link href={"/issues/new"}>New Issue</Link>
+        </Button>
+      </div>
+      <Table.Root variant="surface">
+        <Table.Header>
+          <Table.Row>
+            <Table.ColumnHeaderCell>Issue</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell className="hidden md:table-cell">
+              Status
+            </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell className="hidden md:table-cell">
+              Created
+            </Table.ColumnHeaderCell>
+          </Table.Row>
+        </Table.Header>
+
+        <Table.Body>
+          {issues.map((issue) => (
+            <Table.Row key={issue.id}>
+              <Table.Cell>
+                {issue.title}
+                <div className="block md:hidden">
+                  <IssueStatusBadge status={issue.status} />
+                </div>
+              </Table.Cell>
+              <Table.Cell className="hidden md:table-cell">
+                <IssueStatusBadge status={issue.status} />
+              </Table.Cell>
+              <Table.Cell className="hidden md:table-cell">
+                {issue.createdAt.toDateString()}
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table.Root>
+    </div>
+  );
+};
+
+export default IssuesPage;
+```
+
+#### the loading component with skeleton rendered
+
+```tsx
+import { Table } from "@radix-ui/themes";
+import React from "react";
+import IssueStatusBadge from "../components/IssueStatusBadge";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+
+const LoadingIssuesPage = () => {
+  const issues = [1, 2, 3, 4, 5];
+  return (
+    <div>
+      <Table.Root variant="surface">
+        <Table.Header>
+          <Table.Row>
+            <Table.ColumnHeaderCell>Issue</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell className="hidden md:table-cell">
+              Status
+            </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell className="hidden md:table-cell">
+              Created
+            </Table.ColumnHeaderCell>
+          </Table.Row>
+        </Table.Header>
+
+        <Table.Body>
+          {issues.map((issue) => (
+            <Table.Row key={issue}>
+              <Table.Cell>
+                <Skeleton />
+                <div className="block md:hidden">
+                  <Skeleton />
+                </div>
+              </Table.Cell>
+              <Table.Cell className="hidden md:table-cell">
+                <Skeleton />
+              </Table.Cell>
+              <Table.Cell className="hidden md:table-cell">
+                <Skeleton />
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table.Root>
+    </div>
+  );
+};
+
+export default LoadingIssuesPage;
+```
