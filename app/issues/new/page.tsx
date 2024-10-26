@@ -1,7 +1,7 @@
 "use client";
 
 import "easymde/dist/easymde.min.css";
-import { Button, Callout, Text, TextField } from "@radix-ui/themes";
+import { Button, Callout, TextField } from "@radix-ui/themes";
 // import Link from "next/link";
 import React, { useState } from "react";
 import SimpleMdeReact from "react-simplemde-editor";
@@ -12,6 +12,7 @@ import { BiInfoCircle } from "react-icons/bi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createIssueSchema } from "@/app/validationSchemas";
 import { z } from "zod";
+import ErrorMessage from "@/app/components/ErrorMessage";
 // defining an interface for the form fields like this is redundant
 // interface IssueForm {
 //   title: string;
@@ -57,7 +58,7 @@ const NewIssuePage = () => {
         <TextField.Root>
           <TextField.Input placeholder="Title" {...register("title")} />
         </TextField.Root>
-        {errors.title && <Text color="red" as="p">{errors.title.message}</Text>}
+        <ErrorMessage>{errors.title?.message}</ErrorMessage>
         <Controller
           name="description"
           control={control}
@@ -65,9 +66,7 @@ const NewIssuePage = () => {
             <SimpleMdeReact placeholder="Description" {...field} />
           )}
         />
-        {errors.description && (
-          <Text color="red" as="p">{errors.description.message}</Text>
-        )}
+        <ErrorMessage>{errors.description?.message}</ErrorMessage>
         <Button>Submit </Button>
       </form>
     </div>

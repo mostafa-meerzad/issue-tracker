@@ -61,6 +61,8 @@ enum Status {
 }
 ```
 
+## using react-hook-form
+
 when using react-hook-form with TS first define an interface defining the form fields and their types
 
 ```tsx
@@ -81,6 +83,10 @@ const NewIssuePage = () => {
   return <div></div>;
 };
 ```
+
+## use Zod schema to infer the form-field types
+
+first install this `"@hookform/resolvers": "^3.3.1",` package which allows us to use integrate react-hook-form with Zod
 
 here is how to have a Zod schema in one place and use it with React-hook-form
 
@@ -170,4 +176,42 @@ const NewIssuePage = () => {
 };
 
 export default NewIssuePage;
+```
+
+## use react's built-it type for component with children
+
+```tsx
+import { Text } from "@radix-ui/themes";
+import React, { PropsWithChildren } from "react";
+
+interface Props {
+  children: React.ReactNode;
+}
+
+const ErrorMessage = ({ children }: Props) => {
+  return (
+    <Text color="red" as="p">
+      {children}
+    </Text>
+  );
+};
+
+export default ErrorMessage;
+```
+
+it removes the need for defining a type/interface for just one "children" props
+
+```tsx
+import { Text } from "@radix-ui/themes";
+import React, { PropsWithChildren } from "react";
+
+const ErrorMessage = ({ children }: PropsWithChildren) => {
+  return (
+    <Text color="red" as="p">
+      {children}
+    </Text>
+  );
+};
+
+export default ErrorMessage;
 ```
