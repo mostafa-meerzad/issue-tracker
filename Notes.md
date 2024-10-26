@@ -215,3 +215,11 @@ const ErrorMessage = ({ children }: PropsWithChildren) => {
 
 export default ErrorMessage;
 ```
+
+## submit button
+
+remember to disable the submit button after the form is submitted specially if the form is dealing with money/purchase
+
+```tsx
+<Button disabled={isSubmitting}>Submit {isSubmitting && <Spinner />}</Button>
+```
