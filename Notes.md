@@ -407,3 +407,23 @@ const Component = () => {
 ```
 
 the `Controller` here is just to make third-party components integrate with `react-hook-form`
+
+## Improve imports
+
+```ts
+// import and exporting one by one
+
+// import ErrorMessage from "./ErrorMessage";
+// import Spinner from "./Spinner";
+// import IssueStatusBadge from "./IssueStatusBadge";
+// import Link from "./Link";
+
+// export { ErrorMessage, Spinner, IssueStatusBadge, Link };
+
+// import and export in one go
+
+export { default as ErrorMessage } from "./ErrorMessage";
+export { default as Spinner } from "./Spinner";
+export { default as IssueStatusBadge } from "./IssueStatusBadge";
+export { default as Link } from "./Link";
+```

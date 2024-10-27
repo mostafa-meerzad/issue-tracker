@@ -1,26 +1,18 @@
 "use client";
 
-import { Button, Callout, TextField } from "@radix-ui/themes";
-import "easymde/dist/easymde.min.css";
-// import Link from "next/link";
-import ErrorMessage from "@/app/components/ErrorMessage";
-import Spinner from "@/app/components/Spinner";
+import { ErrorMessage, Spinner } from "@/app/components";
 import { createIssueSchema } from "@/app/validationSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, Callout, TextField } from "@radix-ui/themes";
 import axios from "axios";
-import delay from "delay";
+import "easymde/dist/easymde.min.css";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { BiInfoCircle } from "react-icons/bi";
-import dynamic from "next/dynamic";
 import { z } from "zod";
-// defining an interface for the form fields like this is redundant
-// interface IssueForm {
-//   title: string;
-//   description: string;
-// }
-// but the good thing we can use zod to generate/infer this type for us like the following:
+
 type IssueForm = z.infer<typeof createIssueSchema>;
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
@@ -47,7 +39,6 @@ const NewIssuePage = () => {
       router.push("/issues");
     } catch (error) {
       setIsSubmitting(false);
-      // console.log(error);
       setError("An unexpected error occurred!");
     }
   });
