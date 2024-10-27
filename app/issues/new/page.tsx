@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { BiInfoCircle } from "react-icons/bi";
-import SimpleMdeReact from "react-simplemde-editor";
+import dynamic from "next/dynamic";
 import { z } from "zod";
 // defining an interface for the form fields like this is redundant
 // interface IssueForm {
@@ -22,6 +22,9 @@ import { z } from "zod";
 // }
 // but the good thing we can use zod to generate/infer this type for us like the following:
 type IssueForm = z.infer<typeof createIssueSchema>;
+const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
+  ssr: false,
+});
 
 const NewIssuePage = () => {
   const [error, setError] = useState("");
@@ -68,7 +71,7 @@ const NewIssuePage = () => {
           name="description"
           control={control}
           render={({ field }) => (
-            <SimpleMdeReact placeholder="Description" {...field} />
+            <SimpleMDE placeholder="Description" {...field} />
           )}
         />
         <ErrorMessage>{errors.description?.message}</ErrorMessage>

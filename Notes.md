@@ -358,3 +358,52 @@ const LoadingIssuesPage = () => {
 
 export default LoadingIssuesPage;
 ```
+
+## fixing the error that appears in the console while visiting the `http://localhost:3000/issues/new` page
+
+```terminal
+⨯ ReferenceError: navigator is not defined
+    at __webpack_require__ (D:\Courses\Next.Js\issue-tracker\.next\server\webpack-runtime.js:33:43)
+    at __webpack_require__ (D:\Courses\Next.Js\issue-tracker\.next\server\webpack-runtime.js:33:43)
+    at __webpack_require__ (D:\Courses\Next.Js\issue-tracker\.next\server\webpack-runtime.js:33:43)
+    at eval (./app/issues/new/page.tsx:21:80)
+    at (ssr)/./app/issues/new/page.tsx (D:\Courses\Next.Js\issue-tracker\.next\server\app\issues\new\page.js:292:1)
+    at Object.__webpack_require__ [as require] (D:\Courses\Next.Js\issue-tracker\.next\server\webpack-runtime.js:33:43)
+digest: "1299040761"
+ GET /issues/new 500 in 717ms
+```
+
+this error happens because the `SimpleMDE` is a client-side component and navigator is a browser api but Next.js is initially rendering all pages on the server so this happens
+
+to solve it use `lazy loading`
+
+1. import `dynamic`
+2. make a constant with the same name as the target component in this case `SimpleMDE`
+3. call the `dynamic` function first-arg is a callback returning the result of importing the target component, the second-arg is a configuration object configure the rendering behavior
+4. the constant we declared is gonna replace the initial import of the component
+
+```tsx
+import dynamic from "next/dynamic";
+
+//... the reset
+
+const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
+  ssr: false,
+});
+
+const Component = () => {
+  return (
+    <>
+      <Controller
+        name="description"
+        control={control}
+        render={({ field }) => (
+          <SimpleMDE placeholder="Description" {...field} />
+        )}
+      />
+    </>
+  );
+};
+```
+
+the `Controller` here is just to make third-party components integrate with `react-hook-form`
