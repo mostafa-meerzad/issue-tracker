@@ -4,12 +4,12 @@ import Link from "../components/Link";
 import React from "react";
 import IssueStatusBadge from "../components/IssueStatusBadge";
 //import delay function to simulate a slow connection
-import delay from "delay";
+// import delay from "delay";
 import IssueActions from "./IssueActions";
 
 const IssuesPage = async () => {
   const issues = await prisma.issue.findMany();
-  await delay(2000);
+  // await delay(2000);
   return (
     <div>
       <IssueActions />

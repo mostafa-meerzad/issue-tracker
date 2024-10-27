@@ -1,19 +1,20 @@
 "use client";
 
-import "easymde/dist/easymde.min.css";
 import { Button, Callout, TextField } from "@radix-ui/themes";
+import "easymde/dist/easymde.min.css";
 // import Link from "next/link";
-import React, { useState } from "react";
-import SimpleMdeReact from "react-simplemde-editor";
-import { Controller, useForm } from "react-hook-form";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import { BiInfoCircle } from "react-icons/bi";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { createIssueSchema } from "@/app/validationSchemas";
-import { z } from "zod";
 import ErrorMessage from "@/app/components/ErrorMessage";
 import Spinner from "@/app/components/Spinner";
+import { createIssueSchema } from "@/app/validationSchemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import delay from "delay";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { BiInfoCircle } from "react-icons/bi";
+import SimpleMdeReact from "react-simplemde-editor";
+import { z } from "zod";
 // defining an interface for the form fields like this is redundant
 // interface IssueForm {
 //   title: string;
@@ -22,7 +23,8 @@ import Spinner from "@/app/components/Spinner";
 // but the good thing we can use zod to generate/infer this type for us like the following:
 type IssueForm = z.infer<typeof createIssueSchema>;
 
-const NewIssuePage = () => {
+const NewIssuePage = async () => {
+  await delay(1000);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {
