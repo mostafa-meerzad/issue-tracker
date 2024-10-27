@@ -427,3 +427,125 @@ export { default as Spinner } from "./Spinner";
 export { default as IssueStatusBadge } from "./IssueStatusBadge";
 export { default as Link } from "./Link";
 ```
+
+## Single Responsibility Principle
+
+**SRP**: Software entities should have a single responsibility.
+
+### Applying SRP
+
+before applying SRP
+
+```tsx
+import { IssueStatusBadge } from "@/app/components";
+import prisma from "@/prisma/client";
+import { Pencil2Icon } from "@radix-ui/react-icons";
+import { Box, Button, Card, Flex, Grid, Heading, Text } from "@radix-ui/themes";
+import delay from "delay";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import ReactMarkdown from "react-markdown";
+// too many import statements in a single file is a sign of violating SRP
+interface Props {
+  params: { id: string };
+}
+
+const IssueDetailPage = async ({ params }: Props) => {
+  const issue = await prisma.issue.findUnique({
+    where: { id: parseInt(params.id) },
+  });
+  await delay(2000);
+  if (!issue) notFound();
+
+  // our pages should have only one responsibility which is LAYOUT! everything else is not it's responsibility
+  return (
+    // <Grid columns={{ initial: "1", md: "2" }} gap={"5"}> and two columns </Grid> is the layout
+    <Grid columns={{ initial: "1", md: "2" }} gap={"5"}>
+      <Box>
+        // details of this colum should go in a separate component
+        <Heading>{issue.title}</Heading>
+        <Flex gap={"3"} my={"3"}>
+          <IssueStatusBadge status={issue.status} />
+          <Text>{issue.createdAt.toDateString()}</Text>
+        </Flex>
+        <Card className="prose" mt="4">
+          <ReactMarkdown>{issue.description}</ReactMarkdown>
+        </Card>
+      </Box>
+      <Box>
+        // as well as this column content
+        <Button>
+          <Pencil2Icon />
+          <Link href={`/issues/${issue.id}/edit`}>Edit Issue</Link>
+        </Button>
+      </Box>
+    </Grid>
+  );
+};
+
+export default IssueDetailPage;
+```
+
+after applying SRP
+
+```tsx
+import { Pencil2Icon } from "@radix-ui/react-icons";
+import { Button } from "@radix-ui/themes";
+import Link from "next/link";
+
+const EditIssueButton = ({ issueId }: { issueId: number }) => {
+  return (
+    <Button>
+      <Pencil2Icon />
+      <Link href={`/issues/${issueId}/edit`}>Edit Issue</Link>
+    </Button>
+  );
+};
+
+export default EditIssueButton;
+```
+
+the details component is now a separate component
+
+```tsx
+import { IssueStatusBadge } from "@/app/components";
+import { Issue } from "@prisma/client";
+import { Card, Flex, Heading, Text } from "@radix-ui/themes";
+import ReactMarkdown from "react-markdown";
+
+const IssueDetails = ({ issue }: { issue: Issue }) => {
+  return (
+    <>
+      <Heading>{issue.title}</Heading>
+      <Flex gap={"3"} my={"3"}>
+        <IssueStatusBadge status={issue.status} />
+        <Text>{issue.createdAt.toDateString()}</Text>
+      </Flex>
+      <Card className="prose" mt="4">
+        <ReactMarkdown>{issue.description}</ReactMarkdown>
+      </Card>
+    </>
+  );
+};
+
+export default IssueDetails;
+```
+
+as well as edit button
+
+```tsx
+import { Pencil2Icon } from "@radix-ui/react-icons";
+import { Button } from "@radix-ui/themes";
+import Link from "next/link";
+
+const EditIssueButton = ({ issueId }: { issueId: number }) => {
+  return (
+    <Button>
+      <Pencil2Icon />
+      <Link href={`/issues/${issueId}/edit`}>Edit Issue</Link>
+    </Button>
+  );
+};
+
+export default EditIssueButton;
+```
