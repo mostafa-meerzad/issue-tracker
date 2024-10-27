@@ -23,8 +23,7 @@ import { z } from "zod";
 // but the good thing we can use zod to generate/infer this type for us like the following:
 type IssueForm = z.infer<typeof createIssueSchema>;
 
-const NewIssuePage = async () => {
-  await delay(1000);
+const NewIssuePage = () => {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {
