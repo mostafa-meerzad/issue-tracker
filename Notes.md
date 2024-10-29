@@ -549,3 +549,10 @@ const EditIssueButton = ({ issueId }: { issueId: number }) => {
 
 export default EditIssueButton;
 ```
+
+Note: use `_components` to exclude this folder from the routing system even if you add a page file init
+
+`PUT` function is used to update an entire object on the server.
+
+`PATCH` function is used to update parts of an object on the server.
+
