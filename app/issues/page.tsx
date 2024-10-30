@@ -44,4 +44,9 @@ const IssuesPage = async () => {
   );
 };
 
+export const dynamic = "force-dynamic"
+
+// export const revalidate = 0// setting revalidate to 0 means this page should be revalidated every 0secs which means all the time
+// export const revalidate = 10 // setting revalidate to a number means this page should be refreshed every that number of seconds
+
 export default IssuesPage;

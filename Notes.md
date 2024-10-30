@@ -78,7 +78,7 @@ const NewIssuePage = () => {
     control,
     formState: { errors },
   } = useForm<IssueForm>({
-    resolver: zodResolver(createIssueSchema),
+    resolver: zodResolver(issueSchema),
   });
   return <div></div>;
 };
@@ -90,7 +90,7 @@ first install this `"@hookform/resolvers": "^3.3.1",` package which allows us to
 
 here is how to have a Zod schema in one place and use it with React-hook-form
 
-`type IssueForm = z.infer<typeof createIssueSchema>;`
+`type IssueForm = z.infer<typeof issueSchema>;`
 
 ```tsx
 "use client";
@@ -105,7 +105,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { BiInfoCircle } from "react-icons/bi";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createIssueSchema } from "@/app/validationSchemas";
+import { issueSchema } from "@/app/validationSchemas";
 import { z } from "zod";
 // defining an interface for the form fields like this is redundant
 // interface IssueForm {
@@ -113,7 +113,7 @@ import { z } from "zod";
 //   description: string;
 // }
 // but the good thing we can use zod to generate/infer this type for us like the following:
-type IssueForm = z.infer<typeof createIssueSchema>;
+type IssueForm = z.infer<typeof issueSchema>;
 
 const NewIssuePage = () => {
   const [error, setError] = useState("");
@@ -123,7 +123,7 @@ const NewIssuePage = () => {
     control,
     formState: { errors },
   } = useForm<IssueForm>({
-    resolver: zodResolver(createIssueSchema),
+    resolver: zodResolver(issueSchema),
   });
   const router = useRouter();
 
@@ -556,3 +556,160 @@ Note: use `_components` to exclude this folder from the routing system even if y
 
 `PATCH` function is used to update parts of an object on the server.
 
+## Understand Caching in Next.js
+
+In Next there is Three layers of caching
+
+### Data Cache:
+
+When we fetch data using `fetch()`, whenever we use fetch to get data Next stores the results to the data-cache so next time we ask for the same piece of data Next will not make a request to get the data again instead it's gonna return the results from the cache, this data is permanently stored in the file-system until we re-deploy the website/app
+
+```js
+fetch("url", { cache: "no-cache" }); // to disable the caching
+fetch("url", { next: { revalidate: 3600 } }); // specify a time limit to refresh cached data
+```
+
+### Full Route Cache (Cache on the Server)
+
+Used to store the output of statically rendered routes
+
+**Note**: routes that has no parameter is considered static by default
+
+Rendering in Next falls into two catagories:
+
+1. Static (at build time, when we build our app for deploying)
+2. dynamic (at request time, before and after our app is deployed )
+
+```terminal
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    138 B          87.5 kB
+├ ○ /_not-found                          873 B          88.2 kB
+├ ƒ /api/issues                          0 B                0 B
+├ ƒ /api/issues/[id]                     0 B                0 B
+├ ○ /issues                              1.08 kB         168 kB
+├ ƒ /issues/[id]                         1.08 kB         168 kB
+├ ƒ /issues/[id]/edit                    1.28 kB         143 kB
+└ ○ /issues/new                          1.28 kB         143 kB
++ First Load JS shared by all            87.3 kB
+  ├ chunks/117-37233ba610560b68.js       31.6 kB
+  ├ chunks/fd9d1056-3750f1c68fb99acb.js  53.6 kB
+  └ other shared chunks (total)          2.09 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+```
+
+in the output above the `localhost:3000/issues` page is rendered statically so if you create a new issue it is not gonna be shown when you're redirected to the `issues/` page!
+
+to solve it we need to somehow disable the cache in `issue` page and make it render dynamically
+
+`https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config` is the page having hints of solution
+
+back into the `/issues` page
+
+```tsx
+import prisma from "@/prisma/client";
+import { Table } from "@radix-ui/themes";
+import { IssueStatusBadge, Link } from "@/app/components";
+import IssueActions from "./IssueActions";
+
+const IssuesPage = async () => {
+  const issues = await prisma.issue.findMany();
+  return (
+    <div>
+      <IssueActions />
+      <Table.Root variant="surface">
+        <Table.Header>
+          <Table.Row>
+            <Table.ColumnHeaderCell>Issue</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell className="hidden md:table-cell">
+              Status
+            </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell className="hidden md:table-cell">
+              Created
+            </Table.ColumnHeaderCell>
+          </Table.Row>
+        </Table.Header>
+
+        <Table.Body>
+          {issues.map((issue) => (
+            <Table.Row key={issue.id}>
+              <Table.Cell>
+                <Link href={`/issues/${issue.id}`}>{issue.title}</Link>
+                <div className="block md:hidden">
+                  <IssueStatusBadge status={issue.status} />
+                </div>
+              </Table.Cell>
+              <Table.Cell className="hidden md:table-cell">
+                <IssueStatusBadge status={issue.status} />
+              </Table.Cell>
+              <Table.Cell className="hidden md:table-cell">
+                {issue.createdAt.toDateString()}
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table.Root>
+    </div>
+  );
+};
+
+export const dynamic = "force-dynamic"; // this route segment tells Next to opt-out this page from static rendering
+
+export default IssuesPage;
+```
+
+```terminal
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    138 B          87.5 kB
+├ ○ /_not-found                          873 B          88.2 kB
+├ ƒ /api/issues                          0 B                0 B
+├ ƒ /api/issues/[id]                     0 B                0 B
+├ ƒ /issues                              1.08 kB         168 kB
+├ ƒ /issues/[id]                         1.08 kB         168 kB
+├ ƒ /issues/[id]/edit                    1.28 kB         143 kB
+└ ○ /issues/new                          1.28 kB         143 kB
++ First Load JS shared by all            87.3 kB
+  ├ chunks/117-37233ba610560b68.js       31.6 kB
+  ├ chunks/fd9d1056-3750f1c68fb99acb.js  53.6 kB
+  └ other shared chunks (total)          2.09 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+```
+
+## Router Cache (Client-side Cache)
+
+This type of cache is used to store the payload of pages in the browser as the user navigates through our pages.
+
+Next Router automatically stores the content of pages so as the user navigates back and forth between pages they will have a fast navigation experience
+
+- to store payload of pages in the browser
+- lasts for a session
+- gets refreshed when we reload
+
+pages stored in the browser also gets refreshed after a certain period of time
+
+**Note**: We can tell Next to refresh a certain page!
+
+```tsx
+const onSubmit = handleSubmit(async (data) => {
+  try {
+    setIsSubmitting(true);
+    if (issue) axios.patch(`/api/issues/${issue.id}`, data);
+    else await axios.post("/api/issues", data);
+
+    router.push("/issues");
+    router.refresh(); // this line tells Next to refresh the contents of this route, in this case "/issues"
+  } catch (error) {
+    setIsSubmitting(false);
+    setError("An unexpected error occurred!");
+  }
+});
+```
