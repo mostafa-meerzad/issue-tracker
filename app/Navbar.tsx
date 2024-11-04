@@ -9,7 +9,7 @@ const Navbar = () => {
   const currentPath = usePathname(); // this hook comes with Next.js that allows us to get the current-path path-name
   const links = [
     { label: "Dashboard", href: "/" },
-    { label: "Issues", href: "/issues" },
+    { label: "Issues", href: "/issues/list" },
   ];
 
   return (

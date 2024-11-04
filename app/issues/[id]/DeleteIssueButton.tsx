@@ -15,7 +15,7 @@ const DeleteIssueButton = ({ issueId }: { issueId: number }) => {
       // throw new Error("something intentional");
       setIsDeleting(true);
       await axios.delete("/api/issues/" + issueId);
-      router.push("/issues");
+      router.push("/issues/list");
       // need to refresh the issues page since it's been cached
       router.refresh();
     } catch (error) {
