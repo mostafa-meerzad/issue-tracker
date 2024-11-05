@@ -713,3 +713,84 @@ const onSubmit = handleSubmit(async (data) => {
   }
 });
 ```
+
+## Protecting routes
+
+to protect routes we need to use **middleware** since we're using **next-auth**.
+
+in the root of the project create a file named `middleware.ts` with the following content:
+
+```tsx
+// all the logic is already defined and provided we just need to use it according to our application needs
+
+// first of all we need to export "next-auth/middleware"
+export { default } from "next-auth/middleware";
+
+// to protect routes all we need is to export this config options
+// matchers is an array of routes to be protected (you just put the route starting with a "/")
+// NOTE: for the second element "/issues/edit/:id+" we need to apply a modifier to "id" parameter
+// "/issues/edit/:id+" this means one or more parameters
+export const config = {
+  matcher: ["/issues/new", "/issues/edit/:id+"],
+};
+```
+
+### Hiding delete and edit buttons
+
+in the "/issues/[id]/page" file use the `getServerSession` which takes auth-options which is
+
+this file is in the `app/api/auth/[...nextauth]/route.ts]` with the following content
+
+```ts
+import NextAuth from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+// add "!" marks at the end of env parameters to tell TS we have values for those!
+
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import prisma from "@/prisma/client";
+// the object given to the NextAuth is the auth-options we want and need in the "getServerSession" function
+const handler = NextAuth({
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+  ],
+});
+
+export { handler as GET, handler as POST };
+```
+
+move the auth-options in a separate file in the root `app/auth` as following
+
+```ts
+import GoogleProvider from "next-auth/providers/google";
+
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import prisma from "@/prisma/client";
+import { NextAuthOptions } from "next-auth";
+
+const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+  ],
+};
+
+export default authOptions;
+```
+
+then import an use it for the `app/api/auth/[...nextauth]/route.ts]` as well as in the `app/issues/[id]/page.tsx` for the `getServerSession` function
+
+### Protect specific routes
+
+in the `app/api/issues` in the **POST** function first check if there is a session object as the first thing in the **POST** handler, if not return a response with a 401 status code
+
+```ts
+const session = await getServerSession(authOptions);
+if (!session) return NextResponse.json({}, { status: 401 });
+```
