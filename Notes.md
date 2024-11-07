@@ -794,3 +794,68 @@ in the `app/api/issues` in the **POST** function first check if there is a sessi
 const session = await getServerSession(authOptions);
 if (!session) return NextResponse.json({}, { status: 401 });
 ```
+
+## Using React Query for Fetching data
+
+### Setting up the React Query
+
+first create a **provider component** in the root of the project
+
+```tsx
+"use client";
+import {
+  QueryClient,
+  QueryClientProvider as ReactQueryClientProvider,
+} from "@tanstack/react-query";
+import { PropsWithChildren } from "react";
+
+// QueryClient is the object where all the cache, refresh, errors of api calls get stored
+// the single source of truth for all external resources
+const queryClient = new QueryClient();
+
+const QueryClientProvider = ({ children }: PropsWithChildren) => {
+  return (
+    // return a provider component which is using react-context to provide the same data for all
+    // the component-tree
+    // this "QueryClientProvider" takes a client props which is that "QueryClient" instance at top
+    <ReactQueryClientProvider client={queryClient}>
+      {children}
+    </ReactQueryClientProvider>
+  );
+};
+
+export default QueryClientProvider;
+```
+
+### Calling a backend end-point
+
+```tsx
+const AssigneeSelect = () => {
+  useQuery({
+     queryKey: ["users"], // this queryKey is a unique key and used for caching purposes
+    queryFn: () => axios.get("/api/users").then(res =>res.data) // React-Query doesn't call end-points on it's own, instead you can use "fetch()" or "axios" to call the backend
+    staleTime: 60 * 1000, // 60s time , time delay between refetching data
+    retry: 3, // times to retry if can't get the data
+    });
+
+
+  return (
+    <Select.Root>
+      <Select.Trigger placeholder={"Assign..."} />
+
+      <Select.Content>
+        <Select.Group>
+          <Select.Label>Suggestions</Select.Label>
+          {users.map((user) => (
+            <Select.Item value={user.id} key={user.id}>
+              {user.name}
+            </Select.Item>
+          ))}
+        </Select.Group>
+      </Select.Content>
+    </Select.Root>
+  );
+};
+
+export default AssigneeSelect;
+```
