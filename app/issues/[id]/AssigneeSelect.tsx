@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Skeleton from "@/app/components/Skeleton";
+import toast, {Toaster} from "react-hot-toast"
 
 const AssigneeSelect = ({ issue }: { issue: Issue }) => {
   const {
@@ -23,8 +24,9 @@ const AssigneeSelect = ({ issue }: { issue: Issue }) => {
 
   if (error) return null;
 
-  return (
-    <Select.Root
+  return (<>
+  
+  <Select.Root
       defaultValue={issue.assignedToUserId || ""}
       onValueChange={(userId) => {
         // in the patch request below we need userId and issueId
@@ -33,6 +35,8 @@ const AssigneeSelect = ({ issue }: { issue: Issue }) => {
         // for issueId we need to get issue as a prop from the page.tsx component
         axios.patch("/api/issues/" + issue.id, {
           assignedToUserId: userId || null,
+        }).catch(() => {
+          toast.error("Changes could not be saved!")
         });
       }}
     >
@@ -50,7 +54,9 @@ const AssigneeSelect = ({ issue }: { issue: Issue }) => {
         </Select.Group>
       </Select.Content>
     </Select.Root>
-  );
+  
+  <Toaster/>
+  </>);
 };
 
 export default AssigneeSelect;
