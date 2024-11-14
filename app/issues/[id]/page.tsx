@@ -7,17 +7,20 @@ import DeleteIssueButton from "./DeleteIssueButton";
 import { getServerSession } from "next-auth";
 import authOptions from "@/app/auth/authOptions";
 import AssigneeSelect from "./AssigneeSelect";
+import { cache } from "react";
 
 interface Props {
   params: { id: string };
 }
 
+const fetchIssue = cache((issueId: number) =>
+  prisma.issue.findUnique({ where: { id: issueId } })
+);
+
 const IssueDetailPage = async ({ params }: Props) => {
   const session = await getServerSession(authOptions);
 
-  const issue = await prisma.issue.findUnique({
-    where: { id: parseInt(params.id) },
-  });
+  const issue = await fetchIssue(parseInt(params.id));
   // await delay(2000);
   if (!issue) notFound();
 
@@ -29,7 +32,7 @@ const IssueDetailPage = async ({ params }: Props) => {
       {session && (
         <Box>
           <Flex gap={"4"} direction={"column"}>
-            <AssigneeSelect issue={issue}/>
+            <AssigneeSelect issue={issue} />
             <EditIssueButton issueId={issue.id} />
             <DeleteIssueButton issueId={issue.id} />
           </Flex>
@@ -41,13 +44,13 @@ const IssueDetailPage = async ({ params }: Props) => {
 
 // in this page we want to have dynamic metadata, here is how?
 
-export async function generateMetadata({params}:Props){
-  const issue = await prisma.issue.findUnique({where: { id: parseInt(params.id)}})
+export async function generateMetadata({ params }: Props) {
+  const issue = await fetchIssue(parseInt(params.id));
 
   return {
     title: issue?.title,
-    description: "Details of issue " + issue?.id
-  }
+    description: "Details of issue " + issue?.id,
+  };
 }
 
 export default IssueDetailPage;
