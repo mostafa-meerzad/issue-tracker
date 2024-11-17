@@ -27,16 +27,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <QueryClientProvider>
-          <AuthProvider>
+        <AuthProvider>
+          <QueryClientProvider>
             <Theme appearance="light" accentColor="blue" grayColor="gray">
               <Navbar />
               <main className="px-5">
                 <Container>{children}</Container>
               </main>
             </Theme>
-          </AuthProvider>
-        </QueryClientProvider>
+          </QueryClientProvider>
+        </AuthProvider>
       </body>
     </html>
   );
