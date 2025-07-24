@@ -1,34 +1,94 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🐞 Issue Tracker App
 
-## Getting Started
+A full-featured **Issue Tracking System** built with **Next.js 14**, **TypeScript**, **Prisma**, and **MySQL**. Designed for developers and teams to manage bugs, tasks, and feature requests with ease — complete with filtering, role-based assignment, validation, and interactive charts.
 
-First, run the development server:
+> 🔧 Built by following [Mosh Hamedani’s Next.js Mastery Course](https://codewithmosh.com/)
+> 📌 UI can be improved with polish (planned in future updates 😉)
+
+---
+
+## 🚀 Live Demo
+
+[🔗 View Live App](https://issue-tracker-two-smoky.vercel.app/)
+
+---
+
+## 📸 Preview
+
+![Home page](./issue-tracker.png)
+
+---
+
+## 🛠️ Tech Stack
+
+- ⚙️ **Next.js 14 (App Router)**
+- 📦 **TypeScript**
+- 🧠 **Prisma ORM** + **MySQL**
+- 💅 **Tailwind CSS** + **Radix UI**
+- 🧪 **Zod** for validation
+- 📝 **React Hook Form**
+- 🔔 **React Hot Toast** for notifications
+- 📊 **Chart.js** for data visualization
+
+---
+
+## ✨ Features
+
+- 🐛 Create, view, update, and delete issues
+- 👥 Assign issues to registered users
+- 📊 Graphs and statistics for issue tracking
+- ✅ Server-side validation with **Zod**
+- ⚡ Smooth forms with **React Hook Form**
+- 🔐 Auth setup ready for role-based control _(extendable)_
+- 🍞 Instant feedback with **Hot Toast**
+- 🔍 Filtering and sorting on issues
+- 📱 Fully responsive
+
+---
+
+---
+
+## 📦 Getting Started
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/mostafa-meerzad/issue-tracker
+cd issue-tracker
+npm install
+```
+
+### 2. Set Up the Database
+
+Make sure you have a MySQL server running.
+
+```bash
+npx prisma migrate dev --name init
+```
+
+Create a .env file and configure your DB connection:
+
+```bash
+DATABASE_URL="mysql://user:password@localhost:3306/issue_tracker"
+
+```
+
+### 3. Run the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🧠 Learning Purpose
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+This project was developed by following Mosh Hamedani’s full-stack Next.js course to master advanced web app architecture, full CRUD flows, and real-world best practices.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## 🧪 Future Improvements
 
-## Learn More
+🎨 Improve UI with animations and design polish
 
-To learn more about Next.js, take a look at the following resources:
+🧑‍🤝‍🧑 Role-based access control
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+🔍 Full-text search and advanced filters
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+📧 Email notifications
